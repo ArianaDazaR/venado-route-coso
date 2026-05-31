@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
-import { Home, Users, BarChart3, Sparkles, Menu, Bell, Search, ChevronDown, Phone, Mail, Clock, MapPin, Plus, AlertTriangle, TrendingUp, Calendar, Download, Target, Timer, LogOut, Share2, CheckCircle2, ArrowDown, ArrowUp, Shield, Activity, Network } from "lucide-react";
+import { Hop as Home, Users, ChartBar as BarChart3, Sparkles, Menu, Bell, Search, ChevronDown, Phone, Mail, Clock, MapPin, Plus, TriangleAlert as AlertTriangle, TrendingUp, Calendar, Download, Target, Timer, LogOut, Share2, CircleCheck as CheckCircle2, ArrowDown, ArrowUp, Shield, Activity, Network, FileText } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { useVenado } from "@/lib/venado-store";
 import { VenadoLogo } from "./VenadoLogo";
+import { generatePDFReport } from "@/lib/pdf-generator";
 
 type STab = "dashboard" | "equipo" | "reportes" | "ia";
 
@@ -320,6 +321,37 @@ function Reportes() {
   const dist = [{ b: "0-15", v: 18, c: "oklch(0.55 0.2 295)" }, { b: "15-30", v: 46, c: "oklch(0.45 0.2 265)" }, { b: "30-45", v: 24, c: "oklch(0.75 0.17 60)" }, { b: "45+", v: 12, c: "oklch(0.65 0.22 25)" }];
   const km = [{ b: "0-10 km", v: 28, c: "oklch(0.65 0.17 150)" }, { b: "10-20 km", v: 48, c: "oklch(0.45 0.2 265)" }, { b: "20-30 km", v: 18, c: "oklch(0.75 0.17 60)" }, { b: "30+ km", v: 6, c: "oklch(0.65 0.22 25)" }];
 
+  const handleExportPDF = () => {
+    const reportData = {
+      date: "Lunes, 20 de mayo de 2024",
+      supervisor: "Juan Pérez",
+      metrics: [
+        { label: "Tiempo traslado", value: "24.3 min", delta: "↑ +6.2%" },
+        { label: "Distancia PDV", value: "18.6 km", delta: "↑ +5.1%" },
+        { label: "PDV visitados", value: "35", delta: "↑ +3.4%" },
+        { label: "Cumplimiento", value: "92%", delta: "↑ +4.7%" },
+        { label: "Tiempo tienda", value: "12.1 min", delta: "↑ +4.3%" },
+        { label: "Jornada", value: "8h 23m", delta: "↑ +3.8%" },
+        { label: "Eficiencia", value: "84%", delta: "↑ +5.6%" },
+        { label: "Desv. estándar", value: "1.32 min", delta: "↑ +9.1%" },
+      ],
+      teamPerformance: [
+        { name: "Juan Pérez", route: "Ruta Norte", efficiency: 84, visits: 35, avgTime: "24.3 min", distance: "18.6 km", compliance: 84 },
+        { name: "Ana López", route: "Ruta Sur", efficiency: 78, visits: 28, avgTime: "22.1 min", distance: "16.2 km", compliance: 80 },
+        { name: "Carlos Rojas", route: "Ruta Este", efficiency: 70, visits: 20, avgTime: "30.5 min", distance: "20.1 km", compliance: 71 },
+        { name: "María González", route: "Ruta Centro", efficiency: 90, visits: 38, avgTime: "21.0 min", distance: "15.8 km", compliance: 92 },
+      ],
+      alerts: [
+        { type: "critical" as const, title: "Juan Pérez", description: "35 min promedio (+7 min sobre lo esperado)", time: "10:24 a. m." },
+        { type: "warning" as const, title: "Zona Sur", description: "12 PDV pendientes", time: "10:15 a. m." },
+        { type: "warning" as const, title: "Ruta 5", description: "Sobrecarga operativa", time: "09:58 a. m." },
+        { type: "info" as const, title: "Mayorista San José", description: "Inventario crítico", time: "09:40 a. m." },
+      ],
+    };
+
+    generatePDFReport(reportData);
+  };
+
   return (
     <div>
       <SHeader />
@@ -331,8 +363,11 @@ function Reportes() {
           <Pill icon={<Calendar className="h-3.5 w-3.5" />} label="13 - 20 May, 2024" />
           <Pill icon={<Users className="h-3.5 w-3.5" />} label="Todos los reponedores" />
           <Pill icon={<MapPin className="h-3.5 w-3.5" />} label="Todas las rutas" />
-          <button className="shrink-0 inline-flex items-center gap-1 px-3 py-2 rounded-xl border-2 border-primary text-primary text-xs font-bold">
-            <Download className="h-3.5 w-3.5" /> Exportar
+          <button
+            onClick={handleExportPDF}
+            className="shrink-0 inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold shadow-md hover:bg-primary/90 transition-colors"
+          >
+            <FileText className="h-3.5 w-3.5" /> Exportar PDF
           </button>
         </div>
 
